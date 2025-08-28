@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+"""
+Port Scanner - Educational Tool
+Author: YourName
+Description: A simple port scanner to detect open ports on a target host.
+"""
+
+import socket
+import sys
+
+def port_scanner(host, start_port=1, end_port=1024):
+    print(f"[+] Scanning {host} from {start_port} to {end_port}...\n")
+    try:
+        for port in range(start_port, end_port + 1):
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(0.5)
+            result = s.connect_ex((host, port))
+            if result == 0:
+                try:
+                    service = socket.getservbyport(port)
+                except:
+                    service = "unknown"
+                print(f"[OPEN] Port {port} ({service})")
+            s.close()
+    except KeyboardInterrupt:
+        print("\n[!] Scan stopped by user.")
+        sys.exit(1)
+    except socket.gaierror:
+        print("[!] Hostname could not be resolved.")
+        sys.exit(1)
+    except socket.error:
+        print("[!] Could not connect to server.")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    target = input("Enter target host (IP or domain): ").strip()
+    start = input("Enter start port (default 1): ").strip()
+    end = input("Enter end port (default 1024): ").strip()
+
+    start = int(start) if start else 1
+    end = int(end) if end else 1024
+
+    port_scanner(target, start, end)
